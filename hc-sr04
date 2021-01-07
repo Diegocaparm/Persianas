@@ -1,12 +1,22 @@
+#include "main.h"
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+
+uint32_t local_time, sensor_time;
+uint32_t distance;
+void wait(int time){
+	int j=0;
+	while(j<time)
+		j++;
+}
 uint32_t hcsr04_read (void)
 {
  local_time=0;
  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);  // pull the TRIG pin HIGH
- HAL_Delay(0.002);  // wait for 2 us
-
+ wait(2);  // wait for 2 us
 
  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);  // pull the TRIG pin HIGH
- HAL_Delay(0.01);   // wait for 10 us
+ wait(10);   // wait for 10 us
  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);  // pull the TRIG pin low
 
  // read the time for which the pin is high
@@ -18,60 +28,26 @@ uint32_t hcsr04_read (void)
   }
  return local_time;
 }
-/* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-  
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_TIM1_Init();
-  /* USER CODE BEGIN 2 */
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
+ 
+ while (1)
   {
-    /* USER CODE END WHILE */
+    
 	  sensor_time = hcsr04_read();
 	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
-	  distance  = sensor_time /20;
+	  distance  = sensor_time /17;
 	  if(distance<30)
 	    	 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_SET);
 
 	  HAL_Delay(200);
-    /* USER CODE BEGIN 3 */
+   
   }
-  /* USER CODE END 3 */
+  
 }
