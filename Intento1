@@ -43,10 +43,12 @@ uint32_t distance;
 
 //Funciones interrupciones
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
 //Variables interrupciones
 volatile int flag = 0;
 int modo = 0;
+volatile int t = -1;
 
 
 int main(void)
@@ -62,9 +64,7 @@ int main(void)
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Start(&hadc3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-
-
-  HAL_ADC_Stop(&hadc1);
+  HAL_TIM_Base_Start_IT(&htim2);
 
   while (1)
   {
@@ -81,6 +81,7 @@ int main(void)
 
 	  while (modo == 1){
 		  //Hcsr04
+		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 1);
 		  sensor_time = hcsr04_read();
 		  distance  = sensor_time /17;
 		  if(distance<30)
@@ -92,21 +93,26 @@ int main(void)
 
 	  while (modo == 2){
 		  //LDR
+		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 1);
 		  lum = LDR();
 		  if (lum > 80)
 			  subir_persiana();
 		  else if (lum < 30)
 			  bajar_persiana();
 		  waitmin(300000);
+
 	  }
 
 	  while (modo == 3){
 		  //Poten
+		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, 1);
 		  potv = pot();
 		  lector(potv);
 		  waitmin(20);
 	  }
-
+	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 0);
+	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 0);
+	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, 0);
   }
 
 }
@@ -198,6 +204,11 @@ uint32_t hcsr04_read (void)
   local_time++;   // measure time for which the pin is high
   }
  return local_time;
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	t++;
 }
 
 void SystemClock_Config(void)
