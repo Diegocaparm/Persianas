@@ -186,13 +186,15 @@ void waitmin(int timemin)
 	int tickstart = HAL_GetTick();
 	while((HAL_GetTick() - tickstart) < timemin)
 	{
+      if(flag)
+			break;
 	}
 }
 
 uint32_t hcsr04_read (void)
 {
  local_time=0;
- HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9 GPIO_PIN_RESET);  // pull the TRIG pin HIGH
+ HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);  // pull the TRIG pin HIGH
  wait(2);  // wait for 2 us
 
  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_SET);  // pull the TRIG pin HIGH
