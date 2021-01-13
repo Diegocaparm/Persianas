@@ -89,6 +89,7 @@ int main(void)
 		  else
 			  bajar_persiana();
 		  waitmin(5000);
+          modo=0;
 	  }
 
 	  while (modo == 2){
@@ -100,6 +101,7 @@ int main(void)
 		  else if (lum < 30)
 			  bajar_persiana();
 		  waitmin(300000);
+          modo=0;
 
 	  }
 
@@ -109,6 +111,7 @@ int main(void)
 		  potv = pot();
 		  lector(potv);
 		  waitmin(20);
+          modo=0;
 	  }
 	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 0);
 	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 0);
