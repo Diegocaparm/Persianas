@@ -192,17 +192,17 @@ void waitmin(int timemin)
 uint32_t hcsr04_read (void)
 {
  local_time=0;
- HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);  // pull the TRIG pin HIGH
+ HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9 GPIO_PIN_RESET);  // pull the TRIG pin HIGH
  wait(2);  // wait for 2 us
 
- HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);  // pull the TRIG pin HIGH
+ HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_SET);  // pull the TRIG pin HIGH
  wait(10);   // wait for 10 us
- HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);  // pull the TRIG pin low
+ HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);  // pull the TRIG pin low
 
  // read the time for which the pin is high
 
- while (!(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2)));  // wait for the ECHO pin to go high
- while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2))    // while the pin is high
+ while (!(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_10)));  // wait for the ECHO pin to go high
+ while (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_10))    // while the pin is high
   {
   local_time++;   // measure time for which the pin is high
   }
