@@ -83,22 +83,27 @@ int main(void)
 
 	  while (modo == 1){
 		  //Hcsr04
-		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 1);
-		  sensor_time = hcsr04_read();
-		  distance  = sensor_time /17;
-		  if(distance<30)
-			  subir_persiana();
-		  else
-			  bajar_persiana();
-		  waitmin(5000);
-          modo=0;
+		  if (flag == 0) //Mientras no haya una interrupcion que se ejecute el siguiente programa
+		  {
+		      HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 1); //Enciende el LED verde que nos indica el modo que estamos usando
+		      sensor_time = hcsr04_read();
+		      distance  = sensor_time /17;
+		      if(distance<30)
+			      subir_persiana();
+		      else
+			      bajar_persiana();
+		      waitmin(5000); //Vuelve a comprobar la proximidad cada 5 segundos
+		  }
+		  else //Si la hay o pasa cualquier cosa, volvemos al modo 0
+              modo = 0;
+          
 	  }
 
 	  while (modo == 2){
 		  //LDR
 		  if (flag == 0) //Mientras no haya una interrupcion que se ejecute el siguiente programa
 		  {
-			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 1);
+			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 1); //Enciende el LED naranja que nos indica el modo que estamos usando
 			  lum = LDR();
 			  if (lum > 80)
 			  {
@@ -116,7 +121,7 @@ int main(void)
 
 	  while (modo == 3){
 		  //Poten
-		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, 1);
+		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, 1); //Enciende el LED rojo que nos indica el modo que estamos usando
 		  potv = pot();
 		  lector(potv);
 		  waitmin(20);
