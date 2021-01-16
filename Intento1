@@ -61,7 +61,6 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
 
-  HAL_ADC_Start(&hadc1);
   HAL_ADC_Start(&hadc3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_Base_Start_IT(&htim2);
@@ -70,13 +69,13 @@ int main(void)
   {
 	  if (flag)
 	  {
-		  modo = 0;
+		  modo = 0; //Estado de reposo y selección de modo
 		  if ((HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) && (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == 0) && (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == 0)))
-			  modo = 1;
+			  modo = 1; //Modo sensor de presencia
 		  else if ((HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) && (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == 0) && (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == 0)))
-			  modo = 2;
+			  modo = 2; //Modo sensor de luz
 		  else if ((HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) && (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == 0) && (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == 0)))
-			  modo = 3;
+			  modo = 3; //Modo manual ajustable
 		  else
 			  modo = 0;
 		  flag = 0;
@@ -97,15 +96,22 @@ int main(void)
 
 	  while (modo == 2){
 		  //LDR
-		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 1);
-		  lum = LDR();
-		  if (lum > 80)
-			  subir_persiana();
-		  else if (lum < 30)
-			  bajar_persiana();
-		  waitmin(300000);
-          modo=0;
-
+		  if (flag == 0) //Mientras no haya una interrupcion que se ejecute el siguiente programa
+		  {
+			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 1);
+			  lum = LDR();
+			  if (lum > 80)
+			  {
+				  subir_persiana();
+			  }
+			  else if (lum < 30)
+			  {
+				  bajar_persiana();
+			  }
+			  waitmin(300000); //Recarga el valor cada 5 minutos
+		  }
+		  else //Si la hay o pasa cualquier cosa, volvemos al modo 0
+			  modo = 0;
 	  }
 
 	  while (modo == 3){
@@ -148,7 +154,8 @@ void bajar_persiana(void)
 
 int16_t LDR(void)
 {
-	HAL_ADC_PollForConversion(&hadc1, 1000); //Medimos el valor del potenciometro de 0 a 255
+	HAL_ADC_Start(&hadc1); //Iniciamos el canal ADC IN1
+	HAL_ADC_PollForConversion(&hadc1, 100); //Medimos el valor del potenciometro de 0 a 255
 	luminosidad = HAL_ADC_GetValue(&hadc1);
 	return luminosidad;
 }
