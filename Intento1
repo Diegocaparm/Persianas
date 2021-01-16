@@ -61,7 +61,6 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
 
-  HAL_ADC_Start(&hadc3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_Base_Start_IT(&htim2);
 
@@ -121,11 +120,15 @@ int main(void)
 
 	  while (modo == 3){
 		  //Poten
-		  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, 1); //Enciende el LED rojo que nos indica el modo que estamos usando
-		  potv = pot();
-		  lector(potv);
-		  waitmin(20);
-          modo=0;
+		  if (flag == 0) //Ejecuta el siguiente programa mientras no haya interrupciones
+		  {
+			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, 1); //Enciende el LED rojo que nos indica el modo que estamos usando
+			  potv = pot();
+			  lector(potv);
+			  waitmin(20); //Recargamos el valor cada 20 mS para que sea algo continuo
+		  }
+		  else //Vuelta al modo 0 en caso de pulsar el PA0 o de fallo
+			  modo = 0;
 	  }
 	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 0);
 	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, 0);
@@ -142,9 +145,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 int16_t pot(void)
 {
+  	HAL_ADC_Start(&hadc3); //Iniciamos el canal ADC IN3 
 	HAL_ADC_PollForConversion(&hadc3, 100); //Medimos el valor del potenciometro de 0 a 255
-	potval = HAL_ADC_GetValue(&hadc3);
-	return potval;
+	potval = HAL_ADC_GetValue(&hadc3); //Igualamos a una variable el valor obtenido
+	return potval; //Devolvemos la variable
 }
 
 void subir_persiana(void)
@@ -160,23 +164,23 @@ void bajar_persiana(void)
 int16_t LDR(void)
 {
 	HAL_ADC_Start(&hadc1); //Iniciamos el canal ADC IN1
-	HAL_ADC_PollForConversion(&hadc1, 100); //Medimos el valor del potenciometro de 0 a 255
-	luminosidad = HAL_ADC_GetValue(&hadc1);
-	return luminosidad;
+	HAL_ADC_PollForConversion(&hadc1, 100); //Medimos el valor del LDR de 0 a 255
+	luminosidad = HAL_ADC_GetValue(&hadc1); //Igualamos a una variable el valor obtenido
+	return luminosidad; //Devolvemos la variable
 }
 
-void lector(int16_t val)
+void lector(int16_t val) //Función con la que igualaremos los 255 valores posibles del potenciometro con los 180 grados ofrecidos por el servomotor
 {
-	i = 0;
-	j = 14;
-	while (val > j)
+	i = 0; //Igualamos la i a 0 y la aumentaremos de 10 en 10 hasta los 180 (19 tramos)
+	j = 14; //Igualamos la j a 14 y la aumentaremos de 14 en 14 hasta los 252 (18 tramos de 14 y 1 tramo de 3 que es el potenciómetro al máximo)
+	while (val > j) //Mientras el valor entrante sea mayor que j, subirá tramo a tramo hasta ver cual es el tramo en el que está el valor
 	{
 		i = i + 10;
 		j = j + 14;
 		if (i > 180)
 			j = 0;
 	}
-	servo_write(i);
+	servo_write(i); //Una vez identificado el tramo en el cual está el valor, lo escribirá
 }
 
 void servo_write(int angle)
