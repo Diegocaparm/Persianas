@@ -23,6 +23,7 @@ void bajar_persiana(); //Bajar al mínimo
 //Variables servo
 int16_t j; //Valor del potenciometro y variable con la que lo compararemos
 int i; //Valor que irá al servo
+int max; //Valor que nos indicará si está en un máximo nuestro servo
 
 //Funciones ADC
 int16_t LDR(void); //Leer valor LDR
@@ -153,12 +154,14 @@ int16_t pot(void)
 
 void subir_persiana(void)
 {
-	servo_write (180); //Máximo por arriba
+	if (max != 2) //Si la persiana no está ya subida
+		servo_write (180); //Subirla al máximo
 }
 
 void bajar_persiana(void)
 {
-	servo_write (0); //Máximo por abajo
+	if (max != 1) //Si la persiana no está ya bajada
+		servo_write (0); //Bajarla al máximo
 }
 
 int16_t LDR(void)
@@ -185,7 +188,13 @@ void lector(int16_t val) //Función con la que igualaremos los 255 valores posib
 
 void servo_write(int angle) 
 {
-	htim1.Instance->CCR1 = map(0,180,50,250,angle); //Escribimos en el motor un angulo convertido a mS del PWM
+	htim1.Instance->CCR1 = map(0,180,50,250,angle);//Escribimos en el motor un angulo convertido a mS del PWM
+	if (angle == 0)
+		max = 1; //Si el ángulo es 0 que registre que la persiana queda bajada al tope
+	else if (angle == 180)
+		max = 2; //Si el ángulo es 180 que registre que la persiana queda subida al tope
+	else
+		max = 0; 
 }
 
 int map(int st1, int fn1, int st2, int fn2, int value)
