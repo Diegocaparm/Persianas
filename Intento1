@@ -42,8 +42,8 @@ uint32_t local_time, sensor_time;
 uint32_t distance;
 
 //Funciones interrupciones
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin); //Interrupción mediante PA0
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim); //Tiempo del contador 2 
 
 //Variables interrupciones
 volatile int flag = 0;
@@ -66,7 +66,7 @@ int main(void)
 
   while (1)
   {
-	  if (flag)
+	  if (flag) //Si se da una interrupcion sucede los siguiente
 	  {
 		  modo = 0; //Estado de reposo y selección de modo
 		  if ((HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) && (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == 0) && (HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == 0)))
@@ -183,14 +183,14 @@ void lector(int16_t val) //Función con la que igualaremos los 255 valores posib
 	servo_write(i); //Una vez identificado el tramo en el cual está el valor, lo escribirá
 }
 
-void servo_write(int angle)
+void servo_write(int angle) 
 {
-	htim1.Instance->CCR1 = map(0,180,50,250,angle);
+	htim1.Instance->CCR1 = map(0,180,50,250,angle); //Escribimos en el motor un angulo convertido a mS del PWM
 }
 
 int map(int st1, int fn1, int st2, int fn2, int value)
 {
-    return (1.0*(value-st1))/((fn1-st1)*1.0) * (fn2-st2)+st2;
+    return (1.0*(value-st1))/((fn1-st1)*1.0) * (fn2-st2)+st2; //Pasamos de un valor de 0 a 180 a un valor entre 50 y 250
 }
 
 void wait(int time)
