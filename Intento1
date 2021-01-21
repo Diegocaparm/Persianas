@@ -241,7 +241,20 @@ uint32_t hcsr04_read (void)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	t++;
+	if (htim ->Instance == TIM2)
+		t++; //Empieza a contar cada 5 minutos, desde las 9:00
+	if (modo == 0) //Si está en reposo
+	{
+		if (t == 143) //A las 21:00
+			bajar_persiana(); //Bajar las persianas
+		if (t == 287) //A las 9:00 (24h después)
+		{
+			subir_persiana(); //Subir las persianas
+			t = 0; //Reiniciar el contador
+		}
+	}
+	if (t == 287) //Reinicio del contador en caso de no estar en reposo
+		t = 0;
 }
 
 void SystemClock_Config(void)
