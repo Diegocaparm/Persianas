@@ -1,0 +1,17 @@
+La selección de pines que utilizaremos para el uso y control de todos nuestros componentes será la siguiente, donde contaremos con 12 pines:
+
+	- 4 Entradas digitales en GPIO (PD1, PD2, PD3 y PD10) que serán nuestros pulsadores y nuestra receptora de ultrasonidos, respectivamente.
+	- 3 Salidas digitales en GPIO (PD12, PD13 y PD14) que serán nuestros LEDs.
+	- 2 Entradas analógicas en los canales ADC1_IN1 (PA1) y ADC3_IN2 (PA2) que leerán los valores del LDR y del potenciómetro, respectivamente.
+	- 1 Entrada a interrupción EXTI0 (PA0) que será el botón de la placa.
+	- 1 Salida digital en GPIO (PD9) que será la emisora de ultrasonidos.
+	- 1 Salida del canal TIM1-CH1 (PE9) que será la que controle nuestro servomotor mediante PWM.
+
+
+
+Los 2 temporizadores y 2 canales analógicos que utilizaremos tendrán los siguientes ajustes:
+
+	- TIM1: Usaremos el reloj interno y el canal CH1 en modo PWM Generation. Como el reloj interno es de 16 MHz y queremos registrar periodos de 20 mS, usaremos un prescaler de 159 y un counter period de 1999, especificando dentro de las opciones PWM el pulso a 50.
+	- TIM2: Usaremos el reloj interno de 16 MHz y pondremos el prescaler a 63999 y el counter period a 299999 para contar periodos de 20 minutos.
+	- ADC1: El canal leerá el LDR y su resolución será de 8 bits (0 - 255 como valores posibles). 
+	- ADC3: El canal leerá el potenciómetro y su resolución será de 8 bits (0-255 como valores posibles).
